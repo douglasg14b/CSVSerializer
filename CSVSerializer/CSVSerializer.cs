@@ -123,9 +123,13 @@ namespace CSVSerialization
             if (properties.Count != 0)
             {
                 if (headers == null)
+                {
                     output.Add(GetHeaders(properties));
+                }
                 else
+                {
                     output.Add(headers.ToList());
+                }
 
                 foreach (T item in input)
                 {
@@ -134,8 +138,9 @@ namespace CSVSerialization
                 return output;
             }
             else
+            {
                 throw new ArgumentException("There was no valid input to format as a CSV");
-
+            }
         }
 
         //Converts each type T into a list of  based on it's data
@@ -172,13 +177,17 @@ namespace CSVSerialization
                     if (PropertyNameExistsInArray(property, cleanNames))
                     {
                         if (CheckForValidProperty(property, out validType))
+                        {
                             output.Add(validType);
+                        }
                     }
                 }
                 else
                 {
                     if (CheckForValidProperty(property, out validType))
+                    {
                         output.Add(validType);
+                    }
                 }
             }
 
@@ -190,10 +199,10 @@ namespace CSVSerialization
         {
             if (property.PropertyType.IsGenericType)
             {
-                Type interfac1e = property.PropertyType.GetInterface(typeof(ICollection<>).Name);
-                if (interfac1e != null)
+                Type interfaceType = property.PropertyType.GetInterface(typeof(ICollection<>).Name);
+                if (interfaceType != null)
                 {
-                    if (interfac1e.Name == typeof(ICollection<>).Name)
+                    if (interfaceType.Name == typeof(ICollection<>).Name)
                     {
                         if (property.PropertyType.GenericTypeArguments[0].IsPrimitive || property.PropertyType.GenericTypeArguments[0] == typeof(string))
                         {
@@ -218,7 +227,9 @@ namespace CSVSerialization
             foreach (string name in columnNames)
             {
                 if (string.Compare(property.Name, name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -247,25 +258,16 @@ namespace CSVSerialization
 
         #endregion
 
-        //Takes a list of strings and formats them in a CSV style
+        //Takes a list of strings and formats them in a CSV style as a row
         private string FormatCSVRow(List<string> strings, bool lineBreaks)
         {
-            string formatString = "{0}";
-            string outputString = "";
-            for (int i = 0; i < strings.Count; i++)
-            {
-                if (i == strings.Count - 1)
-                {
-                    outputString += string.Format(formatString, strings[i]);
-                }
-                else
-                {
-                    outputString += string.Format(formatString + ",", strings[i]);
-                }
-            }
+            string output = string.Join(",", strings);
             if (lineBreaks)
-                outputString += "\n";
-            return outputString;
+            {
+                output += "\n";
+            }
+
+            return output;
         }
 
         private List<string> GetStringDataFromGenericCollection(PropertyInfo info, T item)
@@ -314,7 +316,9 @@ namespace CSVSerialization
         private string MakeStringSafe(string input)
         {
             if (input.Contains(","))
+            {
                 return "\"" + input + "\"";
+            }
             return input;
 
         }
