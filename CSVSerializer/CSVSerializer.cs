@@ -155,7 +155,8 @@ namespace CSVSerialization
                 }
                 else
                 {
-                    output.Add(MakeStringSafe(CleanString(FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input)))));
+                    string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
+                    output.Add(MakeStringSafe(CleanString(workingString)));
                 }
             }
             return output;
@@ -309,7 +310,11 @@ namespace CSVSerialization
             string lineSeparator = ((char)0x2028).ToString();
             string paragraphSeparator = ((char)0x2029).ToString();
 
-            return input.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty);
+            return input.Replace("\r\n", string.Empty)
+                        .Replace("\n", string.Empty)
+                        .Replace("\r", string.Empty)
+                        .Replace(lineSeparator, string.Empty)
+                        .Replace(paragraphSeparator, string.Empty);
         }
 
         //Encases any comma containing strings in quotes
