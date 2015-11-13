@@ -1,28 +1,62 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSVSerializer
+namespace CSVSerialization
 {
     public class CSVSerializer<T>
     {
+        /// <summary>
+        /// Formats and Writes a CSV to your path
+        /// </summary>
+        /// <param name="path">path and name of your file</param>
+        /// <param name="input">Input collection of objects to format</param>
+        public void WriteCSV(string path, ICollection<T> input)
+        {
+            string CSVString;
+            CSVString = GetCSVString(input);
+
+            StreamWriter writer = new StreamWriter(path);
+            writer.Write(CSVString);
+            writer.Flush();
+            writer.Close();
+        }
+
+        /// <summary>
+        /// Formats and Writes a CSV to your path
+        /// </summary>
+        /// <param name="path">path and name of your file</param>
+        /// <param name="input">Input collection of objects to format</param>
+        /// <param name="collumnNames">Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
+        public void WriteCSV(string path, ICollection<T> input, ICollection<string> collumnNames) 
+        {
+            string CSVString;
+            CSVString = GetCSVString(input, collumnNames);
+
+            StreamWriter writer = new StreamWriter(path);
+            writer.Write(CSVString);
+            writer.Flush();
+            writer.Close();
+        }
+
         /// <summary>
         /// Returns a collection of strings, each a CSV row
         /// </summary>
         /// <param name="input"> Input collection of objects to format</param>
         /// <returns></returns>
-        public List<string> GetCSV(ICollection<T> input)
+        public List<string> GetCSVRows(ICollection<T> input)
         {
             List<List<string>> dataStrings = GetCSVDataStrings(input);
             List<string> output = new List<string>();
 
             foreach (List<string> row in dataStrings)
             {
-                output.Add(FormatCSVRow(row));
+                output.Add(FormatCSVRow(row, false));
             }
             return output;
         }
@@ -30,17 +64,52 @@ namespace CSVSerializer
         /// <summary>
         /// Returns a collection of strings, each a CSV row. Only returns the collumns you specificed
         /// </summary>
-        /// <param name="input"> Input collection of objects to format</param>
-        /// <param name="collumns"> List of Column names that matches the names of your properties. Is not case or white space sensative</param>
+        /// <param name="input"> Input collection of objects to serialize</param>
+        /// <param name="collumnNames"> Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
         /// <returns></returns>
-        public List<string> GetCSV(ICollection<T> input, ICollection<string> collumns)
+        public List<string> GetCSVRows(ICollection<T> input, ICollection<string> collumnNames)
         {
-            List<List<string>> dataStrings = GetCSVDataStrings(input, collumns);
+            List<List<string>> dataStrings = GetCSVDataStrings(input, collumnNames);
             List<string> output = new List<string>();
 
             foreach (List<string> row in dataStrings)
             {
-                output.Add(FormatCSVRow(row));
+                output.Add(FormatCSVRow(row, false));
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Returns a single string formatted as a CSV based on your input objects
+        /// </summary>
+        /// <param name="input">Input collection of objects to serialize</param>
+        /// <returns></returns>
+        public string GetCSVString(ICollection<T> input)
+        {
+            List<List<string>> dataStrings = GetCSVDataStrings(input);
+            string output = "";
+
+            foreach (List<string> row in dataStrings)
+            {
+                output += FormatCSVRow(row, true);
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Returns a single string formatted as a CSV based on your input objects
+        /// </summary>
+        /// <param name="input">Input collection of objects to serialize</param>
+        /// <param name="collumnNames">Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
+        /// <returns></returns>
+        public string GetCSVString(ICollection<T> input, ICollection<string> collumnNames)
+        {
+            List<List<string>> dataStrings = GetCSVDataStrings(input, collumnNames);
+            string output = "";
+
+            foreach (List<string> row in dataStrings)
+            {
+                output += FormatCSVRow(row, true);
             }
             return output;
         }
@@ -179,7 +248,7 @@ namespace CSVSerializer
         #endregion
 
         //Takes a list of strings and formats them in a CSV style
-        private string FormatCSVRow(List<string> strings)
+        private string FormatCSVRow(List<string> strings, bool lineBreaks)
         {
             string formatString = "{0}";
             string outputString = "";
@@ -194,6 +263,8 @@ namespace CSVSerializer
                     outputString += string.Format(formatString + ",", strings[i]);
                 }
             }
+            if (lineBreaks)
+                outputString += "\n";
             return outputString;
         }
 
