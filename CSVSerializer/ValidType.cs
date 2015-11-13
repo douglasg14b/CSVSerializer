@@ -17,5 +17,6 @@ namespace CSVSerialization
 
         public bool IsCollection { get; set; }
         public PropertyInfo PropertyInformation { get; set; }
+        public int SortOrder { get; set; }
     }
 }

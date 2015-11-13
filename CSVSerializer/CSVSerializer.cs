@@ -119,7 +119,7 @@ namespace CSVSerialization
         private List<List<string>> GetCSVDataStrings(ICollection<T> input, ICollection<string> headers = null)
         {
             List<List<string>> output = new List<List<string>>();
-            List<ValidType> properties = FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), headers);
+            List<ValidType> properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), headers), headers);
             if (properties.Count != 0)
             {
                 if (headers == null)
@@ -192,6 +192,23 @@ namespace CSVSerialization
                 }
             }
 
+            return output;
+        }
+
+        //Sorts the properties by the collumn name orders
+        private List<ValidType> SortProperties(List<ValidType> properties, ICollection<string> columnNames)
+        {
+            foreach(ValidType property in properties)
+            {
+                for (int i = 0; i < columnNames.Count; i++)
+                {
+                    if(string.Compare(property.PropertyInformation.Name, columnNames.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        property.SortOrder = i;
+                    }
+                }
+            }
+            List<ValidType> output = properties.OrderBy(o => o.SortOrder).ToList();
             return output;
         }
 
