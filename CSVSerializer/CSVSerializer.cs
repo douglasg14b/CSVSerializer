@@ -31,10 +31,27 @@ namespace CSVSerialization
         /// <param name="path">path and name of your file</param>
         /// <param name="input">Input collection of objects to format</param>
         /// <param name="collumnNames">Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
-        public void WriteCSV(string path, ICollection<T> input, ICollection<string> collumnNames) 
+        public void WriteCSV(string path, ICollection<T> input, ICollection<string> columnNames) 
         {
             string CSVString;
-            CSVString = GetCSVString(input, collumnNames);
+            CSVString = GetCSVString(input, columnNames);
+
+            StreamWriter writer = new StreamWriter(path);
+            writer.Write(CSVString);
+            writer.Flush();
+            writer.Close();
+        }
+
+        /// <summary>
+        /// Formats and Writes a CSV to your path
+        /// </summary>
+        /// <param name="path">path and name of your file</param>
+        /// <param name="input">Input collection of objects to format</param>
+        /// <param name="columnNames">Collection of CustomHeaders that specify what you want your headers to be named</param>
+        public void WriteCSV(string path, ICollection<T> input, List<CustomHeader> columnNames)
+        {
+            string CSVString;
+            CSVString = GetCSVString(input, columnNames);
 
             StreamWriter writer = new StreamWriter(path);
             writer.Write(CSVString);
@@ -63,11 +80,11 @@ namespace CSVSerialization
         /// Returns a collection of strings, each a CSV row. Only returns the collumns you specificed
         /// </summary>
         /// <param name="input"> Input collection of objects to serialize</param>
-        /// <param name="collumnNames"> Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
+        /// <param name="columnNames"> Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
         /// <returns></returns>
-        public List<string> GetCSVRows(ICollection<T> input, ICollection<string> collumnNames)
+        public List<string> GetCSVRows(ICollection<T> input, ICollection<string> columnNames)
         {
-            List<List<string>> dataStrings = GetCSVDataStrings(input, collumnNames);
+            List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
             List<string> output = new List<string>();
 
             foreach (List<string> row in dataStrings)
@@ -100,9 +117,27 @@ namespace CSVSerialization
         /// <param name="input">Input collection of objects to serialize</param>
         /// <param name="collumnNames">Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
         /// <returns></returns>
-        public string GetCSVString(ICollection<T> input, ICollection<string> collumnNames)
+        public string GetCSVString(ICollection<T> input, ICollection<string> columnNames)
         {
-            List<List<string>> dataStrings = GetCSVDataStrings(input, collumnNames);
+            List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
+            string output = "";
+
+            foreach (List<string> row in dataStrings)
+            {
+                output += FormatCSVRow(row, true);
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Returns a single string formatted as a CSV based on your input objects
+        /// </summary>
+        /// <param name="input">Input collection of objects to serialize</param>
+        /// <param name="columnNames">Collection of CustomHeaders that specify what you want your headers to be named</param>
+        /// <returns></returns>
+        public string GetCSVString(ICollection<T> input, List<CustomHeader> columnNames)
+        {
+            List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
             string output = "";
 
             foreach (List<string> row in dataStrings)
@@ -150,6 +185,40 @@ namespace CSVSerialization
                 throw new ArgumentException("There was no valid input to format as a CSV");
             }
         }
+
+        //Retrieves a 2-dimensional array of strings that represents the input classes, rpeserving the header names specified by the user
+        private List<List<string>> GetCSVDataStrings(ICollection<T> input, List<CustomHeader> headers)
+        {
+            List<List<string>> output = new List<List<string>>();
+
+            List<ValidType> properties;
+            List<string> cleanHeaders = new List<string>();
+            List<string> customHeaders = new List<string>();
+            foreach (CustomHeader header in headers)
+            {
+                cleanHeaders.Add(CleanStringOfCaseAndSpace(header.HeaderPropertyName));
+                customHeaders.Add(MakeStringSafe(CleanString(header.HeaderOutputName)));
+            }
+            properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), cleanHeaders), cleanHeaders);
+
+            if (properties.Count != 0)
+            {
+                output.Add(customHeaders);
+                foreach (T item in input)
+                {
+                    output.Add(GetDataRowAsStrings(item, properties));
+                }
+                return output;
+            }
+            else
+            {
+                throw new ArgumentException("There was no valid input to format as a CSV");
+            }
+
+
+
+        }
+
 
         //Converts each type T into a list of  based on it's data
         private List<string> GetDataRowAsStrings(T input, List<ValidType> properties)
@@ -287,6 +356,11 @@ namespace CSVSerialization
                 output.Add(name.ToLower().Replace(" ", ""));
             }
             return output;
+        }
+
+        private string CleanStringOfCaseAndSpace(string input)
+        {
+            return input.ToLower().Replace(" ", "");
         }
 
         //Gets the string headers for each applicable type in T
