@@ -119,7 +119,17 @@ namespace CSVSerialization
         private List<List<string>> GetCSVDataStrings(ICollection<T> input, ICollection<string> headers = null)
         {
             List<List<string>> output = new List<List<string>>();
-            List<ValidType> properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), headers), headers);
+            List<ValidType> properties;
+            if (headers != null)
+            {
+                List<string> cleanHeaders = CleanStringOfCaseAndSpace(headers).ToList();
+                properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), cleanHeaders), cleanHeaders);
+            }
+            else
+            {
+                properties = FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()));
+            }
+
             if (properties.Count != 0)
             {
                 if (headers == null)
@@ -177,19 +187,16 @@ namespace CSVSerialization
         }
 
         //Filters out non accpted Types
-        private List<ValidType> FilterProperties(List<PropertyInfo> properties, ICollection<string> columnNames = null)
+        private List<ValidType> FilterProperties(List<PropertyInfo> properties, ICollection<string> cleanColumnNames = null)
         {
             List<ValidType> output = new List<ValidType>();
-            List<string> cleanNames = new List<string>();
-            if (columnNames != null)
-                cleanNames = CleanStringOfCaseAndSpace(columnNames).ToList();
 
             foreach (PropertyInfo property in properties)
             {
                 ValidType validType;
-                if (columnNames != null) //If there are specific collumn names only add properties that match those names
+                if (cleanColumnNames != null) //If there are specific collumn names only add properties that match those names
                 {
-                    if (PropertyNameExistsInArray(property, cleanNames))
+                    if (PropertyNameExistsInArray(property, cleanColumnNames))
                     {
                         if (CheckForValidProperty(property, out validType))
                         {
@@ -210,13 +217,13 @@ namespace CSVSerialization
         }
 
         //Sorts the properties by the collumn name orders
-        private List<ValidType> SortProperties(List<ValidType> properties, ICollection<string> columnNames)
+        private List<ValidType> SortProperties(List<ValidType> properties, ICollection<string> cleanColumnNames)
         {
             foreach(ValidType property in properties)
             {
-                for (int i = 0; i < columnNames.Count; i++)
+                for (int i = 0; i < cleanColumnNames.Count; i++)
                 {
-                    if(string.Compare(property.PropertyInformation.Name, columnNames.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
+                    if(string.Compare(property.PropertyInformation.Name, cleanColumnNames.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         property.SortOrder = i;
                     }
