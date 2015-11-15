@@ -151,12 +151,26 @@ namespace CSVSerialization
             {
                 if (!property.IsCollection)
                 {
-                    output.Add(MakeStringSafe(CleanString(property.PropertyInformation.GetValue(input).ToString())));
+                    if(property.PropertyInformation.GetValue(input) != null)
+                    {
+                        output.Add(MakeStringSafe(CleanString(property.PropertyInformation.GetValue(input).ToString())));
+                    }
+                    else
+                    {
+                        output.Add("");
+                    }
                 }
                 else
                 {
-                    string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
-                    output.Add(MakeStringSafe(CleanString(workingString)));
+                    if(property.PropertyInformation.GetValue(input) != null)
+                    {
+                        string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
+                        output.Add(MakeStringSafe(CleanString(workingString)));
+                    }
+                    else
+                    {
+                        output.Add("");
+                    }
                 }
             }
             return output;
