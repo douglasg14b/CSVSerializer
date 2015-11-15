@@ -198,6 +198,12 @@ namespace CSVSerialization
                     {
                         if (CheckForValidProperty(property, out validType))
                         {
+                            validType.IsForcedTry = false;
+                            output.Add(validType);
+                        }
+                        else
+                        {
+                            validType.IsForcedTry = true;
                             output.Add(validType);
                         }
                     }
@@ -231,7 +237,7 @@ namespace CSVSerialization
             return output;
         }
 
-        //Checks if the property is of an acceptable type and outputs a ValidType
+        //Checks if the property is of an acceptable type and outputs a ValidType. Only gets sent properties that exist in the collumn names
         private bool CheckForValidProperty(PropertyInfo property, out ValidType validType)
         {
             if (property.PropertyType.IsGenericType)
@@ -254,7 +260,8 @@ namespace CSVSerialization
                 validType = new ValidType(false, property);
                 return true;
             }
-            validType = null;
+
+            validType = new ValidType(false, property);
             return false;
         }
 
@@ -367,7 +374,7 @@ namespace CSVSerialization
                 {
                     output = output.Insert(i, "\"");
                     i+= 3;
-                    if(i-1 <= output.Length)
+                    if(i-1 >= output.Length)
                     {
                         break;
                     }

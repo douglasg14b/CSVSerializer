@@ -16,6 +16,10 @@ namespace CSVSerialization
         }
 
         public bool IsCollection { get; set; }
+        /// <summary>
+        /// If the type is not supported, but is included as a column header by the user
+        /// </summary>
+        public bool IsForcedTry { get; set; }
         public PropertyInfo PropertyInformation { get; set; }
         public int SortOrder { get; set; }
     }
