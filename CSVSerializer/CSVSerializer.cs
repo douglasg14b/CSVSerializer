@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSVSerialization
 {
@@ -355,15 +353,31 @@ namespace CSVSerialization
                         .Replace(paragraphSeparator, string.Empty);
         }
 
-        //Encases any comma containing strings in quotes
+        //Encases any comma containing strings in quotes and puts a quote infront of any in-string quote
         private string MakeStringSafe(string input)
         {
-            if (input.Contains(","))
-            {
-                return "\"" + input + "\"";
-            }
-            return input;
+            bool containsCommas = input.Contains(",");
+            bool containsQuotes = input.Contains("\"");
+            string output = input;
 
+            if (containsQuotes)
+            {
+                int i = 0;
+                while((i = output.IndexOf('"', i)) != -1)
+                {
+                    output = output.Insert(i, "\"");
+                    i+= 3;
+                }
+
+                return "\"" + output + "\"";
+            }
+            else if (containsCommas)
+            {
+                return "\"" + output + "\"";
+            }
+
+
+            return output;
         }
     }
 }
