@@ -367,6 +367,10 @@ namespace CSVSerialization
                 {
                     output = output.Insert(i, "\"");
                     i+= 3;
+                    if(i-1 <= output.Length)
+                    {
+                        break;
+                    }
                 }
 
                 return "\"" + output + "\"";
