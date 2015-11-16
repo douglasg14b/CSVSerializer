@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CSVSerialization
 {
+    /// <summary>
+    /// Holds data regarding your custom header text
+    /// </summary>
     public class CustomHeader
     {
         public CustomHeader(string headerPropertyName, string headerOutputName)

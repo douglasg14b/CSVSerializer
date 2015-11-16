@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace CSVSerialization
 {
+    /// <summary>
+    /// Encases internal information regarding the type of a property
+    /// </summary>
     internal class ValidType
     {
         public ValidType(bool isCollection, PropertyInfo propertyInfo)
