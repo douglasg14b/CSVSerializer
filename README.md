@@ -25,11 +25,13 @@ Use any of the `GetCSVRows()` methods.
 
 **Automatically Assign Columns and Headers:**
 
+    using CSVSerialization;
     CSVSerializer<MyObject> CsvWriter = new CSVSerializer<MyObject>();
     CsvWriter.WriteCSV("MyFolder\MyFile.csv", List<MyObject>);
 
 **Assign your own modified column headers (based on your properties names):**
 
+    using CSVSerialization;
     CSVSerializer<MyObject> CsvWriter = new CSVSerializer<MyObject>();
     List<string> columnNames = new List<string>()
     {
@@ -40,6 +42,7 @@ Use any of the `GetCSVRows()` methods.
   
 **Assign your own custom column headers:**
 
+    using CSVSerialization;
     CSVSerializer<MyObject> CsvWriter = new CSVSerializer<MyObject>();
     List<CustomHeaders> columnNames = new List<CustomHeaders>()
     {
