@@ -48,7 +48,7 @@ namespace CSVSerialization
         /// <param name="path">path and name of your file</param>
         /// <param name="input">Input collection of objects to format</param>
         /// <param name="columnNames">Collection of CustomHeaders that specify what you want your headers to be named</param>
-        public void WriteCSV(string path, ICollection<T> input, List<CustomHeader> columnNames)
+        public void WriteCSV(string path, ICollection<T> input, ICollection<CustomHeader> columnNames)
         {
             string CSVString;
             CSVString = GetCSVString(input, columnNames);
@@ -83,6 +83,24 @@ namespace CSVSerialization
         /// <param name="columnNames"> Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
         /// <returns></returns>
         public List<string> GetCSVRows(ICollection<T> input, ICollection<string> columnNames)
+        {
+            List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
+            List<string> output = new List<string>();
+
+            foreach (List<string> row in dataStrings)
+            {
+                output.Add(FormatCSVRow(row, false));
+            }
+            return output;
+        }
+
+        /// <summary>
+        /// Returns a collection of strings, each a CSV row. Only returns the collumns you specificed
+        /// </summary>
+        /// <param name="input">Input collection of objects to serialize</param>
+        /// <param name="columnNames">Collection of CustomHeaders that specify what you want your headers to be named</param>
+        /// <returns></returns>
+        public List<string> GetCSVRows(ICollection<T> input, ICollection<CustomHeader> columnNames)
         {
             List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
             List<string> output = new List<string>();
@@ -135,7 +153,7 @@ namespace CSVSerialization
         /// <param name="input">Input collection of objects to serialize</param>
         /// <param name="columnNames">Collection of CustomHeaders that specify what you want your headers to be named</param>
         /// <returns></returns>
-        public string GetCSVString(ICollection<T> input, List<CustomHeader> columnNames)
+        public string GetCSVString(ICollection<T> input, ICollection<CustomHeader> columnNames)
         {
             List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
             string output = "";
@@ -189,7 +207,7 @@ namespace CSVSerialization
         }
 
         //Retrieves a 2-dimensional array of strings that represents the input classes, rpeserving the header names specified by the user
-        private List<List<string>> GetCSVDataStrings(ICollection<T> input, List<CustomHeader> headers)
+        private List<List<string>> GetCSVDataStrings(ICollection<T> input, ICollection<CustomHeader> headers)
         {
             List<List<string>> output = new List<List<string>>();
 
