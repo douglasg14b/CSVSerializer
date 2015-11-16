@@ -152,11 +152,13 @@ namespace CSVSerialization
         private List<List<string>> GetCSVDataStrings(ICollection<T> input, ICollection<string> headers = null)
         {
             List<List<string>> output = new List<List<string>>();
+            List<string> validHeaders = new List<string>();
             List<ValidType> properties;
             if (headers != null)
             {
                 List<string> cleanHeaders = CleanStringOfCaseAndSpace(headers).ToList();
                 properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), cleanHeaders), cleanHeaders);
+                validHeaders = FilterColumnHeaders(properties, cleanHeaders, headers);
             }
             else
             {
@@ -171,7 +173,7 @@ namespace CSVSerialization
                 }
                 else
                 {
-                    output.Add(headers.ToList());
+                    output.Add(validHeaders);
                 }
 
                 foreach (T item in input)
@@ -199,7 +201,12 @@ namespace CSVSerialization
                 cleanHeaders.Add(CleanStringOfCaseAndSpace(header.HeaderPropertyName));
                 customHeaders.Add(MakeStringSafe(CleanString(header.HeaderOutputName)));
             }
+
+            //Retrieves and sorts properties that have column names, if the property doesn't have a column name it's filtered out
             properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), cleanHeaders), cleanHeaders);
+
+            //Filters out headers that don't have matching properties
+            customHeaders = FilterColumnHeaders(properties, headers);
 
             if (properties.Count != 0)
             {
@@ -304,6 +311,38 @@ namespace CSVSerialization
             }
             List<ValidType> output = properties.OrderBy(o => o.SortOrder).ToList();
             return output;
+        }
+
+        private List<string> FilterColumnHeaders(List<ValidType> properties, ICollection<string> cleanCustomHeaders, ICollection<string> customHeaders)
+        {
+            List<string> validcolumnNames = new List<string>();
+            foreach (ValidType property in properties)
+            {
+                for(int i = 0; i < customHeaders.Count; i++)
+                {
+                    if (string.Compare(property.PropertyInformation.Name, cleanCustomHeaders.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        validcolumnNames.Add(customHeaders.ElementAt(i));
+                    }
+                }
+            }
+            return validcolumnNames;
+        }
+
+        private List<string> FilterColumnHeaders(List<ValidType> properties, ICollection<CustomHeader> cleanCustomHeaders)
+        {
+            List<string> validcolumnNames = new List<string>();
+            foreach(ValidType property in properties)
+            {
+                foreach(CustomHeader header in cleanCustomHeaders)
+                {
+                    if(string.Compare(property.PropertyInformation.Name, header.HeaderPropertyName, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        validcolumnNames.Add(header.HeaderOutputName);
+                    }
+                }
+            }
+            return validcolumnNames;
         }
 
         //Checks if the property is of an acceptable type and outputs a ValidType. Only gets sent properties that exist in the collumn names
@@ -430,6 +469,7 @@ namespace CSVSerialization
             return input.Replace("\r\n", string.Empty)
                         .Replace("\n", string.Empty)
                         .Replace("\r", string.Empty)
+                        .Replace("\t", string.Empty)
                         .Replace(lineSeparator, string.Empty)
                         .Replace(paragraphSeparator, string.Empty);
         }
@@ -437,7 +477,7 @@ namespace CSVSerialization
         //Encases any comma containing strings in quotes and puts a quote infront of any in-string quote
         private string MakeStringSafe(string input)
         {
-            bool containsCommas = input.Contains(",");
+            bool containsCommasOrSemicolins = input.Contains(",") || input.Contains(";");
             bool containsQuotes = input.Contains("\"");
             string output = input;
 
@@ -456,7 +496,7 @@ namespace CSVSerialization
 
                 return "\"" + output + "\"";
             }
-            else if (containsCommas)
+            else if (containsCommasOrSemicolins)
             {
                 return "\"" + output + "\"";
             }
