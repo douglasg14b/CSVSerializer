@@ -18,7 +18,7 @@ You also have a few options when it comes to your column headers (first row):
 Use any of the `WriteCSV()` methods.
 ####To formated your collection of objects as a single string:
 Use any of the `GetCSVString()` methods.
-####To Format your collection of strings as a collection of rows:
+####To Format your collection of objects as a collection of rows:
 Use any of the `GetCSVRows()` methods.
 
 ###Examples
