@@ -364,7 +364,7 @@ namespace CSVSerialization
             return validcolumnNames;
         }
 
-        //Checks if the property is of an acceptable type and outputs a ValidType. Only gets sent properties that exist in the collumn names
+        //Checks if the property is of an acceptable type and outputs a ValidTypeInfo. Only gets sent properties that exist in the collumn names
         private bool CheckForValidProperty(PropertyDescriptor property, out ValidTypeInfo validType)
         {
             if (property.PropertyType.IsGenericType)
