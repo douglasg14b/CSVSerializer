@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 namespace CSVSerialization
 {
-    [Obsolete("Please use CsvWriter<T>", true)]
-    public class CSVSerializer<T>
+    public class CsvWriter<T>
     {
         /// <summary>
         /// Formats and Writes a CSV to your path
@@ -32,7 +32,7 @@ namespace CSVSerialization
         /// <param name="path">path and name of your file</param>
         /// <param name="input">Input collection of objects to format</param>
         /// <param name="collumnNames">Collection of Column names that matches the names of your properties. Is not case or white space sensative</param>
-        public void WriteCSV(string path, ICollection<T> input, ICollection<string> columnNames) 
+        public void WriteCSV(string path, ICollection<T> input, ICollection<string> columnNames)
         {
             string CSVString;
             CSVString = GetCSVString(input, columnNames);
@@ -172,16 +172,16 @@ namespace CSVSerialization
         {
             List<List<string>> output = new List<List<string>>();
             List<string> validHeaders = new List<string>();
-            List<ValidType> properties;
+            List<ValidTypeInfo> properties;
             if (headers != null)
             {
                 List<string> cleanHeaders = CleanStringOfCaseAndSpace(headers).ToList();
-                properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), cleanHeaders), cleanHeaders);
+                properties = SortProperties(FilterProperties(TypeDescriptor.GetProperties(typeof(T)), cleanHeaders), cleanHeaders);
                 validHeaders = FilterColumnHeaders(properties, cleanHeaders, headers);
             }
             else
             {
-                properties = FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()));
+                properties = FilterProperties(TypeDescriptor.GetProperties(typeof(T)));
             }
 
             if (properties.Count != 0)
@@ -212,7 +212,7 @@ namespace CSVSerialization
         {
             List<List<string>> output = new List<List<string>>();
 
-            List<ValidType> properties;
+            List<ValidTypeInfo> properties;
             List<string> cleanHeaders = new List<string>();
             List<string> customHeaders = new List<string>();
             foreach (CustomHeader header in headers)
@@ -222,7 +222,7 @@ namespace CSVSerialization
             }
 
             //Retrieves and sorts properties that have column names, if the property doesn't have a column name it's filtered out
-            properties = SortProperties(FilterProperties(new List<PropertyInfo>(typeof(T).GetProperties()), cleanHeaders), cleanHeaders);
+            properties = SortProperties(FilterProperties(TypeDescriptor.GetProperties(typeof(T)), cleanHeaders), cleanHeaders);
 
             //Filters out headers that don't have matching properties
             customHeaders = FilterColumnHeaders(properties, headers);
@@ -247,14 +247,14 @@ namespace CSVSerialization
 
 
         //Converts each type T into a list of  based on it's data
-        private List<string> GetDataRowAsStrings(T input, List<ValidType> properties)
+        private List<string> GetDataRowAsStrings(T input, List<ValidTypeInfo> properties)
         {
             List<string> output = new List<string>();
-            foreach (ValidType property in properties)
+            foreach (ValidTypeInfo property in properties)
             {
                 if (!property.IsCollection)
                 {
-                    if(property.PropertyInformation.GetValue(input) != null)
+                    if (property.PropertyInformation.GetValue(input) != null)
                     {
                         output.Add(MakeStringSafe(CleanString(property.PropertyInformation.GetValue(input).ToString())));
                     }
@@ -265,7 +265,7 @@ namespace CSVSerialization
                 }
                 else
                 {
-                    if(property.PropertyInformation.GetValue(input) != null)
+                    if (property.PropertyInformation.GetValue(input) != null)
                     {
                         string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
                         output.Add(MakeStringSafe(CleanString(workingString)));
@@ -280,13 +280,13 @@ namespace CSVSerialization
         }
 
         //Filters out non accpted Types
-        private List<ValidType> FilterProperties(List<PropertyInfo> properties, ICollection<string> cleanColumnNames = null)
+        private List<ValidTypeInfo> FilterProperties(PropertyDescriptorCollection properties, ICollection<string> cleanColumnNames = null)
         {
-            List<ValidType> output = new List<ValidType>();
+            List<ValidTypeInfo> output = new List<ValidTypeInfo>();
 
-            foreach (PropertyInfo property in properties)
+            foreach(PropertyDescriptor property in properties)
             {
-                ValidType validType;
+                ValidTypeInfo validType;
                 if (cleanColumnNames != null) //If there are specific collumn names only add properties that match those names
                 {
                     if (PropertyNameExistsInArray(property, cleanColumnNames))
@@ -316,28 +316,28 @@ namespace CSVSerialization
         }
 
         //Sorts the properties by the collumn name orders
-        private List<ValidType> SortProperties(List<ValidType> properties, ICollection<string> cleanColumnNames)
+        private List<ValidTypeInfo> SortProperties(List<ValidTypeInfo> properties, ICollection<string> cleanColumnNames)
         {
-            foreach(ValidType property in properties)
+            foreach (ValidTypeInfo property in properties)
             {
                 for (int i = 0; i < cleanColumnNames.Count; i++)
                 {
-                    if(string.Compare(property.PropertyInformation.Name, cleanColumnNames.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(property.PropertyInformation.Name, cleanColumnNames.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         property.SortOrder = i;
                     }
                 }
             }
-            List<ValidType> output = properties.OrderBy(o => o.SortOrder).ToList();
+            List<ValidTypeInfo> output = properties.OrderBy(o => o.SortOrder).ToList();
             return output;
         }
 
-        private List<string> FilterColumnHeaders(List<ValidType> properties, ICollection<string> cleanCustomHeaders, ICollection<string> customHeaders)
+        private List<string> FilterColumnHeaders(List<ValidTypeInfo> properties, ICollection<string> cleanCustomHeaders, ICollection<string> customHeaders)
         {
             List<string> validcolumnNames = new List<string>();
-            foreach (ValidType property in properties)
+            foreach (ValidTypeInfo property in properties)
             {
-                for(int i = 0; i < customHeaders.Count; i++)
+                for (int i = 0; i < customHeaders.Count; i++)
                 {
                     if (string.Compare(property.PropertyInformation.Name, cleanCustomHeaders.ElementAt(i), StringComparison.OrdinalIgnoreCase) == 0)
                     {
@@ -348,14 +348,14 @@ namespace CSVSerialization
             return validcolumnNames;
         }
 
-        private List<string> FilterColumnHeaders(List<ValidType> properties, ICollection<CustomHeader> cleanCustomHeaders)
+        private List<string> FilterColumnHeaders(List<ValidTypeInfo> properties, ICollection<CustomHeader> cleanCustomHeaders)
         {
             List<string> validcolumnNames = new List<string>();
-            foreach(ValidType property in properties)
+            foreach (ValidTypeInfo property in properties)
             {
-                foreach(CustomHeader header in cleanCustomHeaders)
+                foreach (CustomHeader header in cleanCustomHeaders)
                 {
-                    if(string.Compare(property.PropertyInformation.Name, header.HeaderPropertyName, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (string.Compare(property.PropertyInformation.Name, header.HeaderPropertyName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         validcolumnNames.Add(header.HeaderOutputName);
                     }
@@ -365,7 +365,7 @@ namespace CSVSerialization
         }
 
         //Checks if the property is of an acceptable type and outputs a ValidType. Only gets sent properties that exist in the collumn names
-        private bool CheckForValidProperty(PropertyInfo property, out ValidType validType)
+        private bool CheckForValidProperty(PropertyDescriptor property, out ValidTypeInfo validType)
         {
             if (property.PropertyType.IsGenericType)
             {
@@ -376,7 +376,7 @@ namespace CSVSerialization
                     {
                         if (property.PropertyType.GenericTypeArguments[0].IsPrimitive || property.PropertyType.GenericTypeArguments[0] == typeof(string))
                         {
-                            validType = new ValidType(true, property);
+                            validType = new ValidTypeInfo(true, property);
                             return true;
                         }
                     }
@@ -384,16 +384,16 @@ namespace CSVSerialization
             }
             else if (property.PropertyType.IsPrimitive || property.PropertyType == typeof(string))
             {
-                validType = new ValidType(false, property);
+                validType = new ValidTypeInfo(false, property);
                 return true;
             }
 
-            validType = new ValidType(false, property);
+            validType = new ValidTypeInfo(false, property);
             return false;
         }
 
         //Checks if the property exists in the array, ignores case and whitespaces.
-        private bool PropertyNameExistsInArray(PropertyInfo property, ICollection<string> columnNames)
+        private bool PropertyNameExistsInArray(PropertyDescriptor property, ICollection<string> columnNames)
         {
             foreach (string name in columnNames)
             {
@@ -422,10 +422,10 @@ namespace CSVSerialization
         }
 
         //Gets the string headers for each applicable type in T
-        private List<string> GetHeaders(List<ValidType> properties)
+        private List<string> GetHeaders(List<ValidTypeInfo> properties)
         {
             List<string> propertyStrings = new List<string>();
-            foreach (ValidType validType in properties)
+            foreach (ValidTypeInfo validType in properties)
             {
                 propertyStrings.Add(validType.PropertyInformation.Name);
             }
@@ -446,7 +446,7 @@ namespace CSVSerialization
             return output;
         }
 
-        private List<string> GetStringDataFromGenericCollection(PropertyInfo info, T item)
+        private List<string> GetStringDataFromGenericCollection(PropertyDescriptor info, T item)
         {
             List<string> output = new List<string>();
             IEnumerable collectionObject = (IEnumerable)info.GetValue(item);
@@ -503,11 +503,11 @@ namespace CSVSerialization
             if (containsQuotes)
             {
                 int i = 0;
-                while((i = output.IndexOf('"', i)) != -1)
+                while ((i = output.IndexOf('"', i)) != -1)
                 {
                     output = output.Insert(i, "\"");
-                    i+= 3;
-                    if(i-1 >= output.Length)
+                    i += 3;
+                    if (i - 1 >= output.Length)
                     {
                         break;
                     }
