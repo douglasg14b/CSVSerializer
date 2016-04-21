@@ -2,14 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace CSVSerialization
 {
     public class CsvWriter<T>
     {
+        private PropertyDescriptorCollection propertiesCollection;
+
         /// <summary>
         /// Formats and Writes a CSV to your path
         /// </summary>
@@ -121,13 +125,12 @@ namespace CSVSerialization
         public string GetCSVString(ICollection<T> input)
         {
             List<List<string>> dataStrings = GetCSVDataStrings(input);
-            string output = "";
-
+            StringBuilder builder = new StringBuilder();
             foreach (List<string> row in dataStrings)
             {
-                output += FormatCSVRow(row, true);
+                builder.Append(FormatCSVRow(row, true));        
             }
-            return output;
+            return builder.ToString();
         }
 
         /// <summary>
@@ -139,13 +142,13 @@ namespace CSVSerialization
         public string GetCSVString(ICollection<T> input, ICollection<string> columnNames)
         {
             List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
-            string output = "";
 
+            StringBuilder builder = new StringBuilder();
             foreach (List<string> row in dataStrings)
             {
-                output += FormatCSVRow(row, true);
+                builder.Append(FormatCSVRow(row, true));
             }
-            return output;
+            return builder.ToString();
         }
 
         /// <summary>
@@ -157,13 +160,13 @@ namespace CSVSerialization
         public string GetCSVString(ICollection<T> input, ICollection<CustomHeader> columnNames)
         {
             List<List<string>> dataStrings = GetCSVDataStrings(input, columnNames);
-            string output = "";
 
+            StringBuilder builder = new StringBuilder();
             foreach (List<string> row in dataStrings)
             {
-                output += FormatCSVRow(row, true);
+                builder.Append(FormatCSVRow(row, true));
             }
-            return output;
+            return builder.ToString();
         }
 
         #region Property Retrieval
