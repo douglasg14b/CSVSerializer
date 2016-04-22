@@ -558,7 +558,7 @@ namespace CsvUtilities.Writer
                 while ((i = output.IndexOf('"', i)) != -1)
                 {
                     output = output.Insert(i, "\"");
-                    i += 3;
+                    i += 2;
                     if (i - 1 >= output.Length)
                     {
                         break;
