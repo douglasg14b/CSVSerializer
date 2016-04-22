@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSVSerialization
+namespace CsvUtilities.Writer
 {
     /// <summary>
     /// Holds data regarding your custom header text

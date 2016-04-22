@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSVSerializer;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,12 +9,21 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace CSVSerialization
+namespace CsvUtilities.Writer
 {
     public class CsvWriter<T>
     {
-        private PropertyDescriptorCollection propertiesCollection;
+        public CsvWriter()
+        {
+            config = new CsvWriterConfig();
+        }
 
+        public CsvWriter(CsvWriterConfig config)
+        {
+            config = this.config;
+        }
+
+        CsvWriterConfig config;
         /// <summary>
         /// Formats and Writes a CSV to your path
         /// </summary>
@@ -481,10 +491,22 @@ namespace CSVSerialization
         //Cleans a string of any new lines or line breaks
         private string CleanString(string input)
         {
+            /*foreach(Character character in config.Characters)
+            {
+                if(config.Strictness <= character.StrictnessToReplace)
+                {
+
+                }
+                else
+                {
+
+                }
+            }*/
             if (String.IsNullOrEmpty(input))
             {
                 return input;
             }
+
             string lineSeparator = ((char)0x2028).ToString();
             string paragraphSeparator = ((char)0x2029).ToString();
 
@@ -494,6 +516,33 @@ namespace CSVSerialization
                         .Replace("\t", string.Empty)
                         .Replace(lineSeparator, string.Empty)
                         .Replace(paragraphSeparator, string.Empty);
+        }
+
+        private string ReplaceCharacter(string input, string character)
+        {
+            return input.Replace(character, string.Empty);
+        }
+
+        private string EscapeCharacter(string input, string character)
+        {
+            if(!input.Contains(character))
+            {
+                return input;
+            }
+
+            string output = input;
+            int i = 0;
+            while((i = output.IndexOf(character, i)) != -1)
+            {
+                output = output.Insert(i, "\"");
+                i += character.Length + 2;
+                if(i - 1 >= output.Length)
+                {
+                    break;
+                }
+            }
+
+            return output;
         }
 
         //Encases any comma containing strings in quotes and puts a quote infront of any in-string quote

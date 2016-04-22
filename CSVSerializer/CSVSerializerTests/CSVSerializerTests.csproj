@@ -55,9 +55,9 @@
     <Compile Include="TestData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CSVSerializer.csproj">
+    <ProjectReference Include="..\CsvUtilities.csproj">
       <Project>{6AFEB346-996C-4821-8317-FB7D0FD06B4B}</Project>
-      <Name>CSVSerializer</Name>
+      <Name>CsvUtilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

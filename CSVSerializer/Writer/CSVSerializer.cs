@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace CSVSerialization
+namespace CsvUtilities.Writer
 {
     [Obsolete("Please use CsvWriter<T>", true)]
     public class CSVSerializer<T>

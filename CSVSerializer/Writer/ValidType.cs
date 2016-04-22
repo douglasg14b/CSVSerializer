@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSVSerialization
+namespace CsvUtilities.Writer
 {
     /// <summary>
     /// Encases internal information regarding the type of a property
