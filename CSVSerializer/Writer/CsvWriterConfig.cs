@@ -20,26 +20,40 @@ namespace CsvUtilities.Writer
 
         public List<Character> Characters { get; } = new List<Character>()
         {
-            new Character("Comma", ",", CsvStrictness.Strict),
-            new Character("Semicolon", ";", CsvStrictness.Strict),
-            new Character("Double Quote", "\"", CsvStrictness.Strict),
-            new Character("Line Break", "\r\n", CsvStrictness.Normal),
-            new Character("New Line", "\n", CsvStrictness.Normal),
-            new Character("Carriage Return", "\r", CsvStrictness.Normal),
-            new Character("Tab", "\t", CsvStrictness.Normal),
-            new Character("Line Seperator", ((char)0x2028).ToString(), CsvStrictness.Normal),
-            new Character("Paragraph Seperator", ((char)0x2029).ToString(), CsvStrictness.Normal),
+            new Character("Comma", ",", CsvStrictness.Strict, false, true),
+            new Character("Semicolon", ";", CsvStrictness.Strict, false, true),
+            new Character("Double Quote", "\"", CsvStrictness.Very_Strict, true, true),
+            new Character("Line Break", "\r\n", CsvStrictness.Normal, false, true),
+            new Character("New Line", "\n", CsvStrictness.Normal, false, true),
+            new Character("Carriage Return", "\r", CsvStrictness.Normal, false, true),
+            new Character("Tab", "\t", CsvStrictness.Normal, false, true),
+            new Character("Line Seperator", ((char)0x2028).ToString(), CsvStrictness.Normal, false, true),
+            new Character("Paragraph Seperator", ((char)0x2029).ToString(), CsvStrictness.Normal, false, true)
         };
     }
 
     /// <summary>
     /// Csv writing strictness.
-    /// The more strict, the more formatting is lost in the output.
+    /// Determines the level of formatting safety the writer uses.
+    /// The stricter, the more formatting is removed.
     /// </summary>
     public enum CsvStrictness
     {
+        /// <summary>
+        /// Removes any characters poor CSV parsers may incorrectly parse
+        /// </summary>
+        Very_Strict = 0,
+        /// <summary>
+        /// Removes any characters poor CSV parsers may incorrectly parse except double quotes
+        /// </summary>
         Strict = 1,
+        /// <summary>
+        /// Removes line breaks and similar formatting some parsers may incorrectly parse
+        /// </summary>
         Normal = 2,
+        /// <summary>
+        /// Exact adherence to RFC 4180
+        /// </summary>
         Loose = 3
     }
 }

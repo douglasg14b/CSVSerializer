@@ -20,7 +20,7 @@ namespace CsvUtilities.Writer
 
         public CsvWriter(CsvWriterConfig config)
         {
-            config = this.config;
+            this.config = config;
         }
 
         CsvWriterConfig config;
@@ -231,7 +231,7 @@ namespace CsvUtilities.Writer
             foreach (CustomHeader header in headers)
             {
                 cleanHeaders.Add(CleanStringOfCaseAndSpace(header.HeaderPropertyName));
-                customHeaders.Add(MakeStringSafe(CleanString(header.HeaderOutputName)));
+                customHeaders.Add(CleanString(header.HeaderOutputName));
             }
 
             //Retrieves and sorts properties that have column names, if the property doesn't have a column name it's filtered out
@@ -269,7 +269,7 @@ namespace CsvUtilities.Writer
                 {
                     if (property.PropertyInformation.GetValue(input) != null)
                     {
-                        output.Add(MakeStringSafe(CleanString(property.PropertyInformation.GetValue(input).ToString())));
+                        output.Add(CleanString(property.PropertyInformation.GetValue(input).ToString()));
                     }
                     else
                     {
@@ -281,7 +281,7 @@ namespace CsvUtilities.Writer
                     if (property.PropertyInformation.GetValue(input) != null)
                     {
                         string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
-                        output.Add(MakeStringSafe(CleanString(workingString)));
+                        output.Add(CleanString(workingString));
                     }
                     else
                     {
@@ -491,31 +491,36 @@ namespace CsvUtilities.Writer
         //Cleans a string of any new lines or line breaks
         private string CleanString(string input)
         {
-            /*foreach(Character character in config.Characters)
+            string output = input;
+            bool hasEscape = false;
+            foreach(Character character in config.Characters)
             {
                 if(config.Strictness <= character.StrictnessToReplace)
                 {
-
+                    output = ReplaceCharacter(output, character.Value);
                 }
                 else
                 {
-
+                    if(character.NeedsColumnEscaping)
+                    {
+                        if (output.Contains(character.Value))
+                        {
+                            if(character.NeedsCharacterEscaping)
+                            {
+                                output = EscapeCharacter(output, character.Value);                                
+                            }
+                            hasEscape = true;
+                        }
+                    }
                 }
-            }*/
-            if (String.IsNullOrEmpty(input))
-            {
-                return input;
             }
 
-            string lineSeparator = ((char)0x2028).ToString();
-            string paragraphSeparator = ((char)0x2029).ToString();
+            if(hasEscape)
+            {
+                output = "\"" + output + "\"";
+            }
 
-            return input.Replace("\r\n", string.Empty)
-                        .Replace("\n", string.Empty)
-                        .Replace("\r", string.Empty)
-                        .Replace("\t", string.Empty)
-                        .Replace(lineSeparator, string.Empty)
-                        .Replace(paragraphSeparator, string.Empty);
+            return output;
         }
 
         private string ReplaceCharacter(string input, string character)
@@ -525,55 +530,7 @@ namespace CsvUtilities.Writer
 
         private string EscapeCharacter(string input, string character)
         {
-            if(!input.Contains(character))
-            {
-                return input;
-            }
-
-            string output = input;
-            int i = 0;
-            while((i = output.IndexOf(character, i)) != -1)
-            {
-                output = output.Insert(i, "\"");
-                i += character.Length + 2;
-                if(i - 1 >= output.Length)
-                {
-                    break;
-                }
-            }
-
-            return output;
-        }
-
-        //Encases any comma containing strings in quotes and puts a quote infront of any in-string quote
-        private string MakeStringSafe(string input)
-        {
-            bool containsCommasOrSemicolins = input.Contains(",") || input.Contains(";");
-            bool containsQuotes = input.Contains("\"");
-            string output = input;
-
-            if (containsQuotes)
-            {
-                int i = 0;
-                while ((i = output.IndexOf('"', i)) != -1)
-                {
-                    output = output.Insert(i, "\"");
-                    i += 2;
-                    if (i - 1 >= output.Length)
-                    {
-                        break;
-                    }
-                }
-
-                return "\"" + output + "\"";
-            }
-            else if (containsCommasOrSemicolins)
-            {
-                return "\"" + output + "\"";
-            }
-
-
-            return output;
+            return input.Replace(character, "\"" + character);
         }
     }
 }
