@@ -12,7 +12,7 @@ namespace CSVSerialization.Tests
     {
 
         public string expectedPrimitiveOutput = "TestBool,TestShort,TestUShort,TestInt,TestUInt,TestLong,TestULong,TestFloat,TestDouble\nTrue,32767,65535,2147483647,4294967295,9223372036854775807,18446744073709551615,3.402823E+38,1.79769313486232E+308\n";
-        public string expectedComplexOutput = "TestString,TestComplexString,ListIntTest\nTest String...,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \",\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\"\n";
+        public string expectedComplexOutput = "TestString,TestComplexString,ListIntTest\nTest String...,\"Test \"\" Complex ;;;;; \n\"\"\"\"\"\"\"\" string\"\"\\\\  \b  \n  \",\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\"\n";
         public class TestPrimitiveData
         {
             public bool TestBool { get; set; } = true;
@@ -33,7 +33,7 @@ namespace CSVSerialization.Tests
         {
             public DateTime DateTimeTest { get; set; } = new DateTime(2015, 11, 22);
             public string TestString { get; set; } = "Test String...";
-            public string TestComplexString { get; set; } = "Test \" Complex ;;;;; \n string\"\\\\  \b  \n  ";
+            public string TestComplexString { get; set; } = "Test \" Complex ;;;;; \n\"\"\"\" string\"\\\\  \b  \n  ";
             public TestStruct Structure { get; set; } = new TestStruct();
             public List<int> ListIntTest { get; set; } = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
         }

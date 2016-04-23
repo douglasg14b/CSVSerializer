@@ -22,7 +22,7 @@ namespace CSVSerialization.Tests
                 new TestData.TestPrimitiveData()
             };
 
-            CsvWriter<TestData.TestPrimitiveData> serializer = new CsvWriter<TestData.TestPrimitiveData>();
+            CsvWriter<TestData.TestPrimitiveData> serializer = new CsvWriter<TestData.TestPrimitiveData>(new CsvWriterConfig(CsvStrictness.Loose));
 
             string output = serializer.GetCSVString(dataList);
 
@@ -39,7 +39,7 @@ namespace CSVSerialization.Tests
                 new TestData.TestComplexData()
             };
 
-            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
+            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>(new CsvWriterConfig(CsvStrictness.Loose));
 
             string output = serializer.GetCSVString(dataList);
             serializer.WriteCSV("TestOutput.csv", dataList);
@@ -63,10 +63,10 @@ namespace CSVSerialization.Tests
                 "Test Complex String"
             };
 
-            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
+            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>(new CsvWriterConfig(CsvStrictness.Loose));
 
             string output = serializer.GetCSVString(dataList, columnNames);
-            string expectedOutput = "Test String,Test Complex String\nTest String...,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
+            string expectedOutput = "Test String,Test Complex String\nTest String...,\"Test \"\" Complex ;;;;; \n\"\"\"\"\"\"\"\" string\"\"\\\\  \b  \n  \"\n";
 
             Assert.AreEqual(output, expectedOutput);
         }
@@ -88,10 +88,10 @@ namespace CSVSerialization.Tests
                 new CustomHeader("TestComplexString", "Test Complex String Header")
             };
 
-            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
+            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>(new CsvWriterConfig(CsvStrictness.Loose));
 
             string output = serializer.GetCSVString(dataList, customHeaders);
-            string expectedOutput = "Test String Header,List Int Test Header,Test Complex String Header\nTest String...,\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\",\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
+            string expectedOutput = "Test String Header,List Int Test Header,Test Complex String Header\nTest String...,\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\",\"Test \"\" Complex ;;;;; \n\"\"\"\"\"\"\"\" string\"\"\\\\  \b  \n  \"\n";
 
             Assert.AreEqual(output, expectedOutput);
         }
@@ -116,10 +116,10 @@ namespace CSVSerialization.Tests
                 new CustomHeader("TestComplexString", "Test Complex String Header")
             };
 
-            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
+            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>(new CsvWriterConfig(CsvStrictness.Loose));
 
             string output = serializer.GetCSVString(dataList, customHeaders);
-            string expectedOutput = "Test String Header,Structure Header,List Int Test Header,Date Time Test Header,Test Complex String Header\nTest String...,CSVSerialization.Tests.TestData+TestStruct,\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\",11/22/2015 12:00:00 AM,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
+            string expectedOutput = "Test String Header,Structure Header,List Int Test Header,Date Time Test Header,Test Complex String Header\nTest String...,CSVSerialization.Tests.TestData+TestStruct,\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\",11/22/2015 12:00:00 AM,\"Test \"\" Complex ;;;;; \n\"\"\"\"\"\"\"\" string\"\"\\\\  \b  \n  \"\n";
 
             Assert.AreEqual(output, expectedOutput);
         }
@@ -140,10 +140,10 @@ namespace CSVSerialization.Tests
                 new CustomHeader("TestComplexString", "Test Complex String Header")
             };
 
-            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
+            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>(new CsvWriterConfig(CsvStrictness.Loose));
 
             string output = serializer.GetCSVString(dataList, customHeaders);
-            string expectedOutput = "Test String Header,Test Complex String Header\nTest String...,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
+            string expectedOutput = "Test String Header,Test Complex String Header\nTest String...,\"Test \"\" Complex ;;;;; \n\"\"\"\"\"\"\"\" string\"\"\\\\  \b  \n  \"\n";
 
             Assert.AreEqual(output, expectedOutput);
         }
