@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Character.cs" />
+    <Compile Include="Reader\CsvReader.cs" />
+    <Compile Include="Reader\CsvReader2.cs" />
     <Compile Include="Writer\CSVSerializer.cs" />
     <Compile Include="Writer\CsvWriter.cs" />
     <Compile Include="Writer\CsvWriterConfig.cs" />

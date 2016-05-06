@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CsvUtilities.csproj">
-      <Project>{6AFEB346-996C-4821-8317-FB7D0FD06B4B}</Project>
+      <Project>{6afeb346-996c-4821-8317-fb7d0fd06b4b}</Project>
       <Name>CsvUtilities</Name>
     </ProjectReference>
   </ItemGroup>
