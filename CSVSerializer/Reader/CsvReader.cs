@@ -110,7 +110,7 @@ namespace CsvUtilities.Reader
         /// <summary>
         /// Contains the field count of each row
         /// </summary>
-        private long _fieldCount;
+        private int _fieldCount;
 
         /// <summary>
         /// Indicates if the first line has been read
@@ -172,7 +172,7 @@ namespace CsvUtilities.Reader
         /// <param name="position">The starting position of the parsing. Will contain the resulting end position.</param>
         /// <returns></returns>
         /// </exception>
-        private bool ParseNewLine(ref int position)
+        private bool ParseNewLine(ref long position)
         {
             char c = _csvData[position];
 
@@ -204,7 +204,7 @@ namespace CsvUtilities.Reader
         /// <returns>
         /// 	<see langword="true"/> if the character at the specified position is a new line delimiter; otherwise, <see langword="false"/>.
         /// </returns>
-        private bool IsNewLine(int pos)
+        private bool IsNewLine(long pos)
         {
             char c = _csvData[pos];
 
@@ -217,6 +217,7 @@ namespace CsvUtilities.Reader
         }
 
         #endregion
+
         /// <summary>
         /// Reads the CSV from the beginning to the end
         /// </summary>
@@ -233,13 +234,29 @@ namespace CsvUtilities.Reader
         {
             if(!_firstLineRead)
             {
-                int fieldCount = 0;
-                while (ParseField(fieldCount))
+                _fieldCount = 0;
+                _fields = new string[2];
+                while (ParseField(_fieldCount))
                 {
-                    fieldCount++;
+                    _fieldCount++;
+
+                    //If the field count is requal to the array size, signficiantly increase the array size
+                    if(_fieldCount == _fields.Length)
+                    {
+                        Array.Resize<string>(ref _fields, (_fieldCount + 1) * 2);
+                    }
                 }
 
-                _fieldCount = fieldCount;
+                // _fieldCount must be incrimented to reflect the field count and not the field index
+                _fieldCount++;
+
+                //Resize the _fields array to match the field count
+                if(_fields.Length != _fieldCount)
+                {
+                    Array.Resize<string>(ref _fields, _fieldCount);
+                }
+
+                _firstLineRead = true;
             }
             else
             {
@@ -253,9 +270,9 @@ namespace CsvUtilities.Reader
         {
             //Index of the current field start
             long index = field;
+            string value = String.Empty;
             while(index < field + 1)
             {
-                string value = String.Empty;
                 if(_csvData[_nextFieldStart] != _quote)
                 {
                     //Unquoted field
@@ -272,7 +289,7 @@ namespace CsvUtilities.Reader
                             _nextFieldStart = pos + 1;
                             break;
                         }
-                        else if(c == '\r' || c == '\n') //If char is a new line or carriage return, you have reached the end of the column
+                        else if(IsNewLine(pos)) //If char is a new line or carriage return, you have reached the end of the column
                         {
                             _nextFieldStart = pos;
                             _eol = true;
@@ -284,13 +301,33 @@ namespace CsvUtilities.Reader
                         }
                     }
 
+                    //If an end of line was hit, write the value, then parse the end of line to skip it for the next field start
+                    if(_eol)
+                    {
+                        value = new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
+                        _eol = ParseNewLine(ref _nextFieldStart);
+                        int g = 0;
+                    }
+                    else
+                    {
+                        value = new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
+                    }
+                    
                 }
                 else
                 {
                     //Quoted Field
                 }
                 index++;
+                
             }
+
+            _fields[field] = value;
+            if (_eol)
+            {
+                return false;
+            }
+
             return true;
         }
     }
