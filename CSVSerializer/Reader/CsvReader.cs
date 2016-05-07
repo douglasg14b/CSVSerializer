@@ -105,7 +105,12 @@ namespace CsvUtilities.Reader
         /// <summary>
         /// A list of the rows parsed by the reader
         /// </summary>
-        private List<string[]> rows;
+        private List<string[]> _rows;
+
+        /// <summary>
+        /// Contains an array of headers for the CSV, if it has headers
+        /// </summary>
+        private string[] _headers;
 
         /// <summary>
         /// Contains the field count of each row
@@ -235,7 +240,7 @@ namespace CsvUtilities.Reader
             if(!_firstLineRead)
             {
                 _fieldCount = 0;
-                _fields = new string[2];
+                _fields = new string[16];
                 while (ParseField(_fieldCount))
                 {
                     _fieldCount++;
@@ -256,11 +261,26 @@ namespace CsvUtilities.Reader
                     Array.Resize<string>(ref _fields, _fieldCount);
                 }
 
+                //If there are headers, write those to the headers var, else write the row to rows
+                if(_hasHeaders)
+                {
+                    _headers = _fields;
+                }
+                else
+                {
+                    _rows.Add(_fields);
+                }
+
                 _firstLineRead = true;
             }
             else
             {
-
+                int field = 0;
+                _fields = new string[16];
+                while (field < _fieldCount && ParseField(field))
+                {
+                    field++;
+                }
             }
 
             return true;
@@ -306,7 +326,6 @@ namespace CsvUtilities.Reader
                     {
                         value = new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
                         _eol = ParseNewLine(ref _nextFieldStart);
-                        int g = 0;
                     }
                     else
                     {
