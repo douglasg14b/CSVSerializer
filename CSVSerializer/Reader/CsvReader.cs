@@ -23,6 +23,7 @@ namespace CsvUtilities.Reader
             _quote = quote;
             _escape = escape;
             _nextFieldStart = 0;
+            _rows = new List<string[]>();
         }
 
         #endregion
@@ -127,6 +128,11 @@ namespace CsvUtilities.Reader
         /// </summary>
         private bool _eol;
 
+        /// <summary>
+        /// Indicates if the last read operation reached the end of the file
+        /// </summary>
+        private bool _eof;
+
         #endregion
 
 
@@ -228,7 +234,8 @@ namespace CsvUtilities.Reader
         /// </summary>
         private void ParseToEnd()
         {
-            while (ParseNextLine()) ;
+            while (ParseNextLine());
+            int v = 1 + 1;
         }
 
         /// <summary>
@@ -245,7 +252,7 @@ namespace CsvUtilities.Reader
                 {
                     _fieldCount++;
 
-                    //If the field count is requal to the array size, signficiantly increase the array size
+                    //If the field count is equal to the array size, signficiantly increase the array size
                     if(_fieldCount == _fields.Length)
                     {
                         Array.Resize<string>(ref _fields, (_fieldCount + 1) * 2);
@@ -276,13 +283,19 @@ namespace CsvUtilities.Reader
             else
             {
                 int field = 0;
-                _fields = new string[16];
+                _fields = new string[_fieldCount];
                 while (field < _fieldCount && ParseField(field))
                 {
                     field++;
                 }
+
+                _rows.Add(_fields);
             }
 
+            if (_eof)
+            {
+                return false;
+            }
             return true;
         }
 
@@ -302,7 +315,6 @@ namespace CsvUtilities.Reader
                     while (pos < _csvDataLength)
                     {
                         char c = _csvData[pos];
-
                         //If the character is a column delimiter, set the next field start and break out of loop
                         if (c == _delimiter)
                         {
@@ -319,6 +331,12 @@ namespace CsvUtilities.Reader
                         {
                             pos++;
                         }
+                    }
+
+                    //If the position is equal to the last character of the file
+                    if (pos == _csvDataLength)
+                    {
+                        _eof = true;
                     }
 
                     //If an end of line was hit, write the value, then parse the end of line to skip it for the next field start
