@@ -175,7 +175,7 @@ namespace CsvUtilities.Reader
             ParseToEnd();
         }
 
-        #region Character Checks
+        #region Character Checks n Stuff
 
         /// <summary>
         /// Parses a new line delimiter.
@@ -225,6 +225,21 @@ namespace CsvUtilities.Reader
                 return true;
             else
                 return false;
+        }
+
+        /// <summary>
+        /// Skips any whitespace characters and returns upon finding a non-whitespace char
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        private bool SkipWhiteSpaces(ref long pos)
+        {
+            while (pos < _csvDataLength && Char.IsWhiteSpace(_csvData[pos]))
+            {
+                pos++;
+            }
+
+            return true;
         }
 
         #endregion
@@ -299,6 +314,7 @@ namespace CsvUtilities.Reader
             return true;
         }
 
+        //Parses through and finds the end of each field
         private bool ParseField(int field)
         {
             //Index of the current field start
@@ -342,18 +358,81 @@ namespace CsvUtilities.Reader
                     //If an end of line was hit, write the value, then parse the end of line to skip it for the next field start
                     if(_eol)
                     {
-                        value = new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
+                        value += new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
                         _eol = ParseNewLine(ref _nextFieldStart);
                     }
                     else
                     {
-                        value = new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
+                        value += new string(_csvData, (int)start, (int)(pos - start)); //TODO Determine why I'm using longs instead of ints....
                     }
                     
                 }
                 else
                 {
                     //Quoted Field
+
+                    //Skip initial quote
+                    long start = _nextFieldStart + 1;
+                    long pos = start;
+
+                    var escaped = false;
+                    var quoted = true;
+
+                    while(pos < _csvDataLength)
+                    {
+                        char c = _csvData[pos];
+
+                        //If the last char was an escape, set the start to the current position after the escape
+                        if(escaped)
+                        {
+                            escaped = false;
+                            start = pos;
+                        }
+                        //If char is an escape and if the next char is a quote
+                        else if (c == _escape && pos + 1 <= _csvDataLength)
+                        {
+                            if(_csvData[pos+1] == _quote)
+                            {
+                                //Add a slice of the field from the start to the escape to the field value
+                                value += new string(_csvData, (int)start, (int)(pos - start));
+                                escaped = true;
+                            }
+                        }
+                        else if(c == _quote)
+                        {
+                            //Set quoted false to indicate that an end was found to the quoted field. This is for validation of correct CSV
+                            quoted = false;
+                            break;
+                        }
+                        pos++;
+                    }
+
+                    //If the field is no longer quoted, break
+                    if(quoted)
+                    {
+                        //TODO: Add something that warns about malformed CSV
+                    }
+
+                    //Append remaining field content
+                    value += new string(_csvData, (int)start, (int)(pos - start));
+
+                    //Skip end of field quote
+                    _nextFieldStart = pos + 1;
+
+                    SkipWhiteSpaces(ref _nextFieldStart);
+
+                    //Skip the field delimiter
+                    bool delimiterSkipped = false;
+                    if(_csvData[_nextFieldStart] == _delimiter)
+                    {
+                        _nextFieldStart++;
+                        delimiterSkipped = true;
+                    }
+
+                    if(!delimiterSkipped)
+                    {
+                        //Parse error?
+                    }
                 }
                 index++;
                 
