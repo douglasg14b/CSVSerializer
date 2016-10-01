@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVSerializer", "CSVSerializer.csproj", "{6AFEB346-996C-4821-8317-FB7D0FD06B4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVSerializer", "CSVUtilities.csproj", "{6AFEB346-996C-4821-8317-FB7D0FD06B4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVSerializerTests", "CSVSerializerTests\CSVSerializerTests.csproj", "{BFAA0277-5DD9-4661-BA24-F3859F75A7CB}"
 EndProject
