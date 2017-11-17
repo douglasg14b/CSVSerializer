@@ -1,9 +1,9 @@
 # CSVSerializer
 A simple easy to use CSV serializer
 
-##Usage
+## Usage
 
-###Basics
+### Basics
 
 This library allows you to take any object and turn it into a CSV. You can either ask the CsvSerializer to write to file for you, return a single string formatted as a CSV, or return a list of strings that is each line of the CSV (without line breaks). 
 
@@ -14,14 +14,14 @@ You also have a few options when it comes to your column headers (first row):
 * You can provide a list of strings that are identicle to your class's properties, except you may change their capitilization and spacing (ie. `conversationNumber` can have a header of `Conversation Number`).
 * You can provide a list of `CustomHeaders` in which you write out your property name and what you wish the associated column header to be.
 
-####To write your collection of objects to a CSV:
+####T o write your collection of objects to a CSV:
 Use any of the `WriteCSV()` methods.
-####To formated your collection of objects as a single string:
+#### To formated your collection of objects as a single string:
 Use any of the `GetCSVString()` methods.
-####To Format your collection of objects as a collection of rows:
+#### To Format your collection of objects as a collection of rows:
 Use any of the `GetCSVRows()` methods.
 
-###Examples
+### Examples
 
 **Automatically Assign Columns and Headers:**
 
