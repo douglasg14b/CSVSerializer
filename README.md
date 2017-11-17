@@ -14,7 +14,7 @@ You also have a few options when it comes to your column headers (first row):
 * You can provide a list of strings that are identicle to your class's properties, except you may change their capitilization and spacing (ie. `conversationNumber` can have a header of `Conversation Number`).
 * You can provide a list of `CustomHeaders` in which you write out your property name and what you wish the associated column header to be.
 
-####T o write your collection of objects to a CSV:
+#### To write your collection of objects to a CSV:
 Use any of the `WriteCSV()` methods.
 #### To formated your collection of objects as a single string:
 Use any of the `GetCSVString()` methods.
@@ -24,13 +24,14 @@ Use any of the `GetCSVRows()` methods.
 ### Examples
 
 **Automatically Assign Columns and Headers:**
-
+```cs
     using CSVSerialization;
     CSVSerializer<MyObject> CsvWriter = new CSVSerializer<MyObject>();
     CsvWriter.WriteCSV("MyFolder\MyFile.csv", List<MyObject>);
+```
 
 **Assign your own modified column headers (based on your properties names):**
-
+```cs
     using CSVSerialization;
     CSVSerializer<MyObject> CsvWriter = new CSVSerializer<MyObject>();
     List<string> columnNames = new List<string>()
@@ -39,9 +40,10 @@ Use any of the `GetCSVRows()` methods.
       "User ID"
     };
     CsvWriter.Write("MyFolder\MyFile.csv", List<MyObject>, columnNames);
+```
   
 **Assign your own custom column headers:**
-
+```cs
     using CSVSerialization;
     CSVSerializer<MyObject> CsvWriter = new CSVSerializer<MyObject>();
     List<CustomHeaders> columnNames = new List<CustomHeaders>()
@@ -50,6 +52,7 @@ Use any of the `GetCSVRows()` methods.
       new CustomHeader("userID", "User Unique ID")
     };
     CsvWriter.Write("MyFolder\MyFile.csv", List<MyObject>, columnNames);
+```
 
     
 
