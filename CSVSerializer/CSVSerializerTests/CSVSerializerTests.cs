@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CsvUtilities.Writer;
+using System.Diagnostics;
+using System.Threading;
 
 namespace CSVSerialization.Tests
 {
@@ -146,6 +148,47 @@ namespace CSVSerialization.Tests
             string expectedOutput = "Test String Header,Test Complex String Header\nTest String...,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
 
             Assert.AreEqual(output, expectedOutput);
+        }
+
+        [TestMethod]
+        public void GetCSVString_PerformanceTest()
+        {
+            //prevent the JIT Compiler from optimizing Fkt calls away
+            long seed = Environment.TickCount;
+
+            //use the second Core/Processor for the test
+            Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(2);
+
+            //prevent "Normal" Processes from interrupting Threads
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+
+            //prevent "Normal" Threads from interrupting this thread
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+
+            int items = 50000;
+            int iterations = 10;
+
+            Stopwatch stopwatch = new Stopwatch();
+            CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
+
+            TestData testData = new TestData();
+            List<TestData.TestComplexData> dataList = new List<TestData.TestComplexData>();
+            for(int i = 0; i < items; i++)
+            {
+                dataList.Add(new TestData.TestComplexData());
+            }
+
+            serializer.GetCSVString(dataList); //Warmup
+            stopwatch.Start();
+            for(int i = 0; i < iterations; i++)
+            {
+                serializer.GetCSVString(dataList);
+            }
+            stopwatch.Stop();
+            double ms = stopwatch.Elapsed.TotalMilliseconds;
+            double msPerIteration = ms / iterations;
+            var test = "";
+
         }
     }
 }

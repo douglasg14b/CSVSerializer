@@ -16,6 +16,8 @@ namespace CsvUtilities.Writer
             Strictness = strictness;
         }
 
+        public char EscapeChar = '"';
+
         public CsvStrictness Strictness { get; private set; } = CsvStrictness.Normal;
 
         public List<Character> Characters { get; } = new List<Character>()
@@ -23,13 +25,57 @@ namespace CsvUtilities.Writer
             new Character("Comma", ",", CsvStrictness.Strict),
             new Character("Semicolon", ";", CsvStrictness.Strict),
             new Character("Double Quote", "\"", CsvStrictness.Strict),
-            new Character("Line Break", "\r\n", CsvStrictness.Normal),
-            new Character("New Line", "\n", CsvStrictness.Normal),
+            new Character("CR-LF Line Break", "\r\n", CsvStrictness.Normal),
+            new Character("POSIX New Line", "\n", CsvStrictness.Normal),
             new Character("Carriage Return", "\r", CsvStrictness.Normal),
             new Character("Tab", "\t", CsvStrictness.Normal),
             new Character("Line Seperator", ((char)0x2028).ToString(), CsvStrictness.Normal),
             new Character("Paragraph Seperator", ((char)0x2029).ToString(), CsvStrictness.Normal),
         };
+
+        public Dictionary<char, bool> GetFlaggedChars(CsvStrictness strictness)
+        {
+            Dictionary<char, bool> output = new Dictionary<char, bool>();
+            for (int i = 0; i < Characters.Count; i++)
+            {
+                if (!Characters[i].IsChar)
+                {
+                    continue;
+                }
+
+                if(Characters[i].StrictnessToReplace == strictness)
+                {
+                    output.Add(Characters[i].CharValue, true);
+                    continue;
+                }
+                output.Add(Characters[i].CharValue, false);
+            }
+            return output;
+        }
+
+        public Dictionary<string, string> GetCharsDictionary()
+        {
+            Dictionary<string, string> output = new Dictionary<string, string>();
+            for (int i = 0; i < Characters.Count; i++)
+            {
+
+                output.Add(Characters[i].Name ,Characters[i].Value);
+            }
+            return output;
+        }
+
+        public HashSet<char> GetCharactersHash(CsvStrictness strictness)
+        {
+            HashSet<char> hash = new HashSet<char>();
+            for(int i = 0; i < Characters.Count; i++)
+            {
+                if(Characters[i].StrictnessToReplace == strictness)
+                {
+                    hash.Add(Characters[i].CharValue);
+                }
+            }
+            return hash;
+        }
     }
 
     /// <summary>

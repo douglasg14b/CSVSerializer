@@ -19,6 +19,14 @@ namespace CSVSerializer
 
         public string Name { get; }
         public string Value { get; }
+        public bool IsChar => Value.Length == 1;
+        public char CharValue
+        {
+            get
+            {
+                return Value[0];
+            }
+        }
         public CsvStrictness StrictnessToReplace { get; }
     }
 }

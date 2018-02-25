@@ -231,7 +231,7 @@ namespace CsvUtilities.Writer
             foreach (CustomHeader header in headers)
             {
                 cleanHeaders.Add(CleanStringOfCaseAndSpace(header.HeaderPropertyName));
-                customHeaders.Add(MakeStringSafe(CleanString(header.HeaderOutputName)));
+                customHeaders.Add(SanitizeString(header.HeaderOutputName));
             }
 
             //Retrieves and sorts properties that have column names, if the property doesn't have a column name it's filtered out
@@ -269,7 +269,7 @@ namespace CsvUtilities.Writer
                 {
                     if (property.PropertyInformation.GetValue(input) != null)
                     {
-                        output.Add(MakeStringSafe(CleanString(property.PropertyInformation.GetValue(input).ToString())));
+                        output.Add(SanitizeString(property.PropertyInformation.GetValue(input).ToString()));
                     }
                     else
                     {
@@ -281,7 +281,7 @@ namespace CsvUtilities.Writer
                     if (property.PropertyInformation.GetValue(input) != null)
                     {
                         string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
-                        output.Add(MakeStringSafe(CleanString(workingString)));
+                        output.Add(SanitizeString(workingString));
                     }
                     else
                     {
@@ -419,6 +419,7 @@ namespace CsvUtilities.Writer
         }
 
         //Cleans a list of strigns of cases and spaces. Used to lower extra load of doing it on the fly for each comparison
+        //Used for headers
         private ICollection<string> CleanStringOfCaseAndSpace(ICollection<string> names)
         {
             List<string> output = new List<string>();
@@ -429,6 +430,7 @@ namespace CsvUtilities.Writer
             return output;
         }
 
+        //Used for headers
         private string CleanStringOfCaseAndSpace(string input)
         {
             return input.ToLower().Replace(" ", "");
@@ -455,7 +457,6 @@ namespace CsvUtilities.Writer
             {
                 output += "\n";
             }
-
             return output;
         }
 
@@ -473,35 +474,44 @@ namespace CsvUtilities.Writer
         //Takes a list of strings a puts them into a single string that be a single CSV item
         private string FormatMultiItemCSVCell(ICollection<string> input)
         {
-            string output = "";
+            StringBuilder builder = new StringBuilder();
             for (int i = 0; i < input.Count; i++)
             {
                 if (i == input.Count - 1)
                 {
-                    output += input.ElementAt(i);
+                    builder.Append(input.ElementAt(i));
                 }
                 else
                 {
-                    output += input.ElementAt(i) + ", ";
+                    builder.Append(", ");
                 }
             }
-            return output;
+            return builder.ToString();
+        }
+
+        private string SanitizeString(string input)
+        {
+            int capacity = input.Length + (int)(input.Length * 0.1f); //Input length + 10%
+            StringBuilder builder = new StringBuilder(capacity); 
+
+            builder.Append('"');
+            for (int i = 0; i < input.Length; i++)
+            {
+                if(input[i] == config.EscapeChar)
+                {
+                    builder.Append('"');
+                }
+                builder.Append(input[i]);
+            }
+
+            builder.Append('"');
+            return builder.ToString();
         }
 
         //Cleans a string of any new lines or line breaks
+        [Obsolete("Use SanitizeString()")]
         private string CleanString(string input)
         {
-            /*foreach(Character character in config.Characters)
-            {
-                if(config.Strictness <= character.StrictnessToReplace)
-                {
-
-                }
-                else
-                {
-
-                }
-            }*/
             if (String.IsNullOrEmpty(input))
             {
                 return input;
@@ -518,11 +528,7 @@ namespace CsvUtilities.Writer
                         .Replace(paragraphSeparator, string.Empty);
         }
 
-        private string ReplaceCharacter(string input, string character)
-        {
-            return input.Replace(character, string.Empty);
-        }
-
+        [Obsolete("Unused")]
         private string EscapeCharacter(string input, string character)
         {
             if(!input.Contains(character))
@@ -546,6 +552,7 @@ namespace CsvUtilities.Writer
         }
 
         //Encases any comma containing strings in quotes and puts a quote infront of any in-string quote
+        [Obsolete("Use SanitizeString()")]
         private string MakeStringSafe(string input)
         {
             bool containsCommasOrSemicolins = input.Contains(",") || input.Contains(";");
