@@ -44,7 +44,7 @@ namespace CSVSerialization.Tests
             CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
 
             string output = serializer.GetCSVString(dataList);
-            serializer.WriteCSV("TestOutput.csv", dataList);
+            //serializer.WriteCSV("TestOutput.csv", dataList);
 
             Assert.AreEqual(output, testData.expectedComplexOutput);
         }
@@ -68,9 +68,8 @@ namespace CSVSerialization.Tests
             CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
 
             string output = serializer.GetCSVString(dataList, columnNames);
-            string expectedOutput = "Test String,Test Complex String\nTest String...,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
 
-            Assert.AreEqual(output, expectedOutput);
+            Assert.AreEqual(output, testData.expectedModifiedHeadersOutput);
         }
 
         [TestMethod()]
@@ -93,9 +92,8 @@ namespace CSVSerialization.Tests
             CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
 
             string output = serializer.GetCSVString(dataList, customHeaders);
-            string expectedOutput = "Test String Header,List Int Test Header,Test Complex String Header\nTest String...,\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\",\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
 
-            Assert.AreEqual(output, expectedOutput);
+            Assert.AreEqual(output, testData.expectedCustomHeaderOutput);
         }
 
         [TestMethod()] //Tests including two non-supported data types through custom headers
@@ -121,9 +119,8 @@ namespace CSVSerialization.Tests
             CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
 
             string output = serializer.GetCSVString(dataList, customHeaders);
-            string expectedOutput = "Test String Header,Structure Header,List Int Test Header,Date Time Test Header,Test Complex String Header\nTest String...,CSVSerialization.Tests.TestData+TestStruct,\"1, 2, 3, 4, 5, 6, 7, 8, 9, 10\",11/22/2015 12:00:00 AM,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
 
-            Assert.AreEqual(output, expectedOutput);
+            Assert.AreEqual(output, testData.expectedComplexInclusiveCustomHeadersOutput);
         }
 
         [TestMethod()] //Tests custom headers excluding a supported type
@@ -145,9 +142,8 @@ namespace CSVSerialization.Tests
             CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
 
             string output = serializer.GetCSVString(dataList, customHeaders);
-            string expectedOutput = "Test String Header,Test Complex String Header\nTest String...,\"Test \"\" Complex ;;;;;  string\"\"\\\\  \b    \"\n";
 
-            Assert.AreEqual(output, expectedOutput);
+            Assert.AreEqual(output, testData.expectedComplexExcludeCustomHeadersOutput);
         }
 
         [TestMethod]
@@ -165,8 +161,8 @@ namespace CSVSerialization.Tests
             //prevent "Normal" Threads from interrupting this thread
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-            int items = 50000;
-            int iterations = 10;
+            int items = 10000;
+            int iterations = 100;
 
             Stopwatch stopwatch = new Stopwatch();
             CsvWriter<TestData.TestComplexData> serializer = new CsvWriter<TestData.TestComplexData>();
