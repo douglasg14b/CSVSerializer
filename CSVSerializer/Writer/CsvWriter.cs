@@ -472,18 +472,21 @@ namespace CsvUtilities.Writer
         }
 
         //Takes a list of strings a puts them into a single string that be a single CSV item
-        private string FormatMultiItemCSVCell(ICollection<string> input)
+        private string FormatMultiItemCSVCell(List<string> input)
         {
+            //StringBuilder builder = new StringBuilder(input[0].Length * (int)(input.Count * 0.1));
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < input.Count; i++)
             {
-                if (i == input.Count - 1)
+                if (i != input.Count - 1)
                 {
-                    builder.Append(input.ElementAt(i));
+                    builder
+                        .Append(input.ElementAt(i))
+                        .Append(',');
                 }
                 else
                 {
-                    builder.Append(", ");
+                    builder.Append(input.ElementAt(i));
                 }
             }
             return builder.ToString();
@@ -492,8 +495,9 @@ namespace CsvUtilities.Writer
         private string SanitizeString(string input)
         {
             int capacity = input.Length + (int)(input.Length * 0.1f); //Input length + 10%
-            StringBuilder builder = new StringBuilder(capacity); 
+            StringBuilder builder = new StringBuilder(capacity);
 
+            //var test = config.GetCharsDictionary
             builder.Append('"');
             for (int i = 0; i < input.Length; i++)
             {

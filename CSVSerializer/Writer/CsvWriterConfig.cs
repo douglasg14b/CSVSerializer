@@ -17,6 +17,8 @@ namespace CsvUtilities.Writer
         }
 
         public char EscapeChar = '"';
+        public char NewLine = '\n';
+        public char CarriageReturn = '\r';
 
         public CsvStrictness Strictness { get; private set; } = CsvStrictness.Normal;
 
