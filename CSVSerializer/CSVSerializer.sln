@@ -7,7 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvUtilities", "CsvUtilitie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSVSerializerTests", "CSVSerializerTests\CSVSerializerTests.csproj", "{BFAA0277-5DD9-4661-BA24-F3859F75A7CB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvUtilitiesExample", "..\CsvUtilitiesExample\CsvUtilitiesExample.csproj", "{B68A655F-7CB5-41DD-B216-0D3E13E6EF12}"
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -21,11 +26,18 @@ Global
 		{BFAA0277-5DD9-4661-BA24-F3859F75A7CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFAA0277-5DD9-4661-BA24-F3859F75A7CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFAA0277-5DD9-4661-BA24-F3859F75A7CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B68A655F-7CB5-41DD-B216-0D3E13E6EF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B68A655F-7CB5-41DD-B216-0D3E13E6EF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B68A655F-7CB5-41DD-B216-0D3E13E6EF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B68A655F-7CB5-41DD-B216-0D3E13E6EF12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7095F964-FCC4-4DBF-9BC7-9082B8609CC4}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

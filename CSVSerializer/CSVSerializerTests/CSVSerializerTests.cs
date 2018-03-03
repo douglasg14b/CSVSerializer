@@ -153,13 +153,13 @@ namespace CSVSerialization.Tests
             long seed = Environment.TickCount;
 
             //use the second Core/Processor for the test
-            Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(2);
+            //Process.GetCurrentProcess().ProcessorAffinity = new IntPtr(2);
 
             //prevent "Normal" Processes from interrupting Threads
-            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            //Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
 
             //prevent "Normal" Threads from interrupting this thread
-            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            //Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
             int items = 10000;
             int iterations = 100;
