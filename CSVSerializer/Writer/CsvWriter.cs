@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CsvUtilities.Writer
 {
@@ -199,6 +201,7 @@ namespace CsvUtilities.Writer
 
             if (properties.Count != 0)
             {
+
                 if (headers == null)
                 {
                     output.Add(GetHeaders(properties));
@@ -207,11 +210,39 @@ namespace CsvUtilities.Writer
                 {
                     output.Add(validHeaders);
                 }
-
-                foreach (T item in input)
+                if (config.Parallel)
                 {
-                    output.Add(GetDataRowAsStrings(item, properties));
+                    Parallel.ForEach<T, Tuple<List<List<string>>, List<ValidTypeInfo>>>(input,
+                            () =>
+                            {
+                                var threadHeaders = FilterProperties(TypeDescriptor.GetProperties(typeof(T)));
+                                return new Tuple<List<List<string>>, List<ValidTypeInfo>>(
+                                    new List<List<string>>(),
+                                    threadHeaders
+                                 );
+                            },
+                            (item, loop, locals) =>
+                            {
+                                locals.Item1.Add(GetDataRowAsStrings(item, locals.Item2));
+                                return locals;
+                            },
+                            (result) =>
+                            {
+                                lock (output)
+                                {
+                                    output.AddRange(result.Item1);
+                                }
+                            }
+                        );
                 }
+                else
+                {
+                    foreach (T item in input)
+                    {
+                        output.Add(GetDataRowAsStrings(item, properties));
+                    }
+                }
+
                 return output;
             }
             else
@@ -253,9 +284,45 @@ namespace CsvUtilities.Writer
             {
                 throw new ArgumentException("There was no valid input to format as a CSV");
             }
+        }
 
-
-
+        //Unused?
+        private List<List<string>> GetPropertyStrings(ICollection<T> input, List<ValidTypeInfo> properties)
+        {
+            List<List<string>> output = new List<List<string>>(input.Count);
+            foreach(T item in input)
+            {
+                foreach(ValidTypeInfo property in properties)
+                {
+                    object value = property.PropertyInformation.GetValue(item);
+                    List<string> itemOutput = new List<string>(properties.Count);
+                    if (!property.IsCollection)
+                    {
+                        if (value != null)
+                        {
+                            itemOutput.Add(value.ToString());
+                        }
+                        else
+                        {
+                            itemOutput.Add("");
+                        }
+                    }
+                    else
+                    {
+                        if (value != null)
+                        {
+                            string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, item));
+                            itemOutput.Add(workingString);
+                        }
+                        else
+                        {
+                            itemOutput.Add("");
+                        }
+                    }
+                    output.Add(itemOutput);
+                }
+            }
+            return output;
         }
 
 
@@ -265,11 +332,12 @@ namespace CsvUtilities.Writer
             List<string> output = new List<string>();
             foreach (ValidTypeInfo property in properties)
             {
+                object value = property.PropertyInformation.GetValue(input);
                 if (!property.IsCollection)
                 {
-                    if (property.PropertyInformation.GetValue(input) != null)
+                    if (value != null)
                     {
-                        output.Add(SanitizeString(property.PropertyInformation.GetValue(input).ToString()));
+                        output.Add(SanitizeString(value.ToString()));
                     }
                     else
                     {
@@ -278,7 +346,7 @@ namespace CsvUtilities.Writer
                 }
                 else
                 {
-                    if (property.PropertyInformation.GetValue(input) != null)
+                    if (value != null)
                     {
                         string workingString = FormatMultiItemCSVCell(GetStringDataFromGenericCollection(property.PropertyInformation, input));
                         output.Add(SanitizeString(workingString));
@@ -328,7 +396,7 @@ namespace CsvUtilities.Writer
             return output;
         }
 
-        //Sorts the properties by the collumn name orders
+        //Sorts the properties by the column name orders
         private List<ValidTypeInfo> SortProperties(List<ValidTypeInfo> properties, ICollection<string> cleanColumnNames)
         {
             foreach (ValidTypeInfo property in properties)
@@ -466,7 +534,10 @@ namespace CsvUtilities.Writer
             IEnumerable collectionObject = (IEnumerable)info.GetValue(item);
             if (collectionObject != null)
             {
-                output = collectionObject.Cast<object>().Select(e => e.ToString()).ToList();
+                foreach(object element in collectionObject)
+                {
+                    output.Add(element.ToString());
+                }
             }
             return output;
         }
@@ -492,12 +563,21 @@ namespace CsvUtilities.Writer
             return builder.ToString();
         }
 
+        private List<string> SanitizeRowOfStrings(List<string> input)
+        {
+            List<string> output = new List<string>(input.Count);
+            foreach(string item in input)
+            {
+                output.Add(SanitizeString(item));
+            }
+            return output;
+        }
+
         private string SanitizeString(string input)
         {
             int capacity = input.Length + (int)(input.Length * 0.1f); //Input length + 10%
             StringBuilder builder = new StringBuilder(capacity);
 
-            //var test = config.GetCharsDictionary
             builder.Append('"');
             for (int i = 0; i < input.Length; i++)
             {

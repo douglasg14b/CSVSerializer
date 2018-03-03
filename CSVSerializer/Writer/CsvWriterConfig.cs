@@ -11,11 +11,13 @@ namespace CsvUtilities.Writer
     {
         public CsvWriterConfig(){}
 
-        public CsvWriterConfig(CsvStrictness strictness)
+        public CsvWriterConfig(CsvStrictness strictness, bool parallel = true)
         {
             Strictness = strictness;
+            Parallel = parallel;
         }
 
+        public bool Parallel { get; set; } = true;
         public char EscapeChar = '"';
         public char NewLine = '\n';
         public char CarriageReturn = '\r';
