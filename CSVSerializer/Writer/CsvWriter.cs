@@ -22,7 +22,7 @@ namespace CsvUtilities.Writer
 
         public CsvWriter(CsvWriterConfig config)
         {
-            config = this.config;
+            this.config = config;
         }
 
         CsvWriterConfig config;
