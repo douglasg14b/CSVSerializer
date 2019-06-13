@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CSVSerializer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("CSV Utilities")]
+[assembly: AssemblyDescription("A simple, easy to use CSV serializer")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("CSVSerializer")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2015")]
+[assembly: AssemblyCompany("Clawfoot Software")]
+[assembly: AssemblyProduct("CSV Utilities")]
+[assembly: AssemblyCopyright("Copyright © Douglas Gaskell 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -7,8 +7,8 @@
     <ProjectGuid>{6AFEB346-996C-4821-8317-FB7D0FD06B4B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CSVSerializer</RootNamespace>
-    <AssemblyName>CSVSerializer</AssemblyName>
+    <RootNamespace>CsvUtilities</RootNamespace>
+    <AssemblyName>CsvUtilities</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

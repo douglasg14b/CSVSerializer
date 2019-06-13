@@ -42,10 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TypeDescriptor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReflectPropertyDescriptor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
