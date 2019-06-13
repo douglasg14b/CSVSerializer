@@ -11,7 +11,7 @@ namespace CsvUtilities.Writer
     {
         public CsvWriterConfig(){}
 
-        public CsvWriterConfig(CsvStrictness strictness, bool parallel = true)
+        public CsvWriterConfig(CsvStrictness strictness, bool parallel = false)
         {
             Strictness = strictness;
             Parallel = parallel;
