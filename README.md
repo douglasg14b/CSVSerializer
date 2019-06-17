@@ -3,6 +3,8 @@ A simple easy to use CSV serializer
 
 ## Usage
 
+Install via nuget: `Install-Package CSVUtilities -Version 1.0.0`
+
 ### Basics
 
 This library allows you to take any object and turn it into a CSV. You can either ask the CsvSerializer to write to file for you, return a single string formatted as a CSV, or return a list of strings that is each line of the CSV (without line breaks). 
